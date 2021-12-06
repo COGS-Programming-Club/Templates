@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <!-- Gathers infrastructure from leaflet -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+    
+    <!-- Creates a fullscreen style for the map-->
+    <style>
+        #map {position: absolute; top:0; bottom:0; left:0; right:0} 
+    </style>
+</head>
+<body>
+    <div id = "map"></div>
+    <script>
+        //Create the map and initialize the parameters
+        var map = L.map('map', {
+        center: [45, -74], // default latitude and longitude on start
+        zoom: 3}); //zoom between 1 and 18; decrease to zoom out
+        
+        //Import a tile layer (from map tiler), this is topographic, include attribution
+        L.tileLayer('https://api.maptiler.com/maps/topographique/{z}/{x}/{y}.png?key=jHjq52sXvZdXP6Mhl06J', {
+            attribution: '<a href="https://www.maptiler.com/copyright/" target="_blank">&copy; MapTiler</a> <a href="https://www.openstreetmap.org/copyright" target="_blank">&copy; OpenStreetMap contributors</a>',
+        }).addTo(map);
+
+        //insert icon to the mpa from the link
+        //make sure to assign icon the the marker <- have to define icon before the marker
+        /*var leafletIcon = L.icon ({
+            iconUrl: 'https://leafletjs.com/examples/custom-icons/leaf-green.png',
+            shadowUrl: 'https://leafletjs.com/examples/custom-icons/leaf-shadow.png',
+            iconSize: [38,95],
+            iconAnchor: [22, 94], //which part of the icon corresponds to the marker location
+            shadowAnchor: [4, 62],
+            popupAnchor: [12, -90] // adds popup anchor to the icon
+        }) */
+
+        //Define an icon class. Use capital letters in both names.
+        var LeafletIcon = L.Icon.extend({
+            options:    {
+                shadowUrl: 'https://leafletjs.com/examples/custom-icons/leaf-shadow.png',
+                iconSize: [38, 95],
+                shadowSize: [50, 64],
+                iconAnchor: [22, 94],
+                shadowAnchor: [4, 62],
+                popupAnchor: [-3, -76]
+            }
+        })
+
+        /*
+        // Insert geoJSON file
+        var myGeoJSON = // COPY AND PASTE GEOJSON INFO HERE
+        //geoJSON coordinates will be in OPPOSITE order
+        L.geoJSON(myGeoJSON).addTo(map)
+        */
+        
+        // L.control holds an element static on the html screen
+        // default controls
+        L.control.scale({
+            metric: true,
+            imperial: false,
+            position: 'bottomleft'
+        }).addTo(map); // adds a scale bar
+
+        L.control.layers( null, null, {
+            position: "topright",
+            collapsed: false
+        }).addTo(map);
+
+        // custom controls require capital C
+        // every new control is assigned parameters from L.control; onAdd and onRemove
+        L.Control.Watermark = L.Control.extend({
+            onAdd:function(map){
+                var img = L.DomUtil.create('img');
+                img.src = 'logo.jpg';
+                img.style.width = '200px';
+                return img;
+            },
+            onRemove:function(map){}
+        })
+
+        // Define a new watermark by passing through the parameters set above
+        L.control.watermark = function(opts){
+            return new L.Control.Watermark(opts);
+        }
+
+        // displays a new watermark
+        L.control.watermark().addTo(map)
+
+        // Create multiple icons from the icon class
+        var greenIcon = new LeafletIcon({iconUrl:'https://leafletjs.com/examples/custom-icons/leaf-green.png'}),
+            redIcon = new LeafletIcon({iconUrl:'https://leafletjs.com/examples/custom-icons/leaf-red.png'}),
+            orangeIcon = new LeafletIcon({iconUrl:'https://leafletjs.com/examples/custom-icons/leaf-orange.png'})
+
+        // Add a marker onto the map with lat/long
+        var marker = L.marker([45, -75.1], {icon:greenIcon}).addTo(map);
+        var marker = L.marker([45, -75.2], {icon:redIcon}).addTo(map);
+        var marker = L.marker([45, -75.3], {icon:orangeIcon}).addTo(map);
+
+        // Create a circle on the map with different parameters
+        var circle = L.circle([45, -75], {
+            colour: 'blue',
+            fillColour: 'black',
+            fillOpacity: 0.5,
+            radius: 500 // metres
+        }).addTo(map);
+
+        // Create a polygon with set points
+        var polygon = L.polygon ([
+            [45.5, -75],
+            [45, -75],
+            [45, -74.5],
+            [45.5, -74.5]
+        ]).addTo(map);
+
+        // binds inserted html code to marker as a popup
+        // openPopup only works for markers and immediately opens attached popup
+        marker.bindPopup("<b> Hey There! </b><br> I am a marker.").openPopup();
+        circle.bindPopup("I am a circle");
+        polygon.bindPopup("I am a polygon");
+    </script>
+
+</body>
+</html>
