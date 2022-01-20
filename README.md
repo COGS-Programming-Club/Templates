@@ -9,3 +9,5 @@ Use the syntax within these files as a base for your own projects.
 
 
 Made by COGS students, for COGS students.
+
+This is a comment added to demonstrate the use of the 'pull' functionality of github.
